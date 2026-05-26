@@ -50,7 +50,9 @@ class BrowseCommand extends BaseCommand
                     'edge' => 'Edge — static / SSG / SSR sites',
                     'servers' => 'Servers',
                     'sites' => 'Sites (server-hosted)',
-                    'insights' => 'Insights summary',
+                    'insights' => 'Insights summary (org-wide)',
+                    'imports' => 'Imports / migrations',
+                    'operator' => 'Operator summary + readme',
                     'quit' => 'Quit',
                 ],
                 default: 'edge',
@@ -61,6 +63,8 @@ class BrowseCommand extends BaseCommand
                 'servers' => $this->browseServers(),
                 'sites' => $this->browseSites(),
                 'insights' => (bool) $this->call('insights:summary'),
+                'imports' => (bool) $this->call('imports:migrations'),
+                'operator' => $this->browseOperator(),
                 'quit' => false,
             };
 
@@ -102,6 +106,8 @@ class BrowseCommand extends BaseCommand
                 'env' => 'List env vars',
                 'logs' => 'Recent logs',
                 'domains' => 'List custom domains',
+                'aliases' => 'List alias hostnames',
+                'access' => 'Show access protection',
                 'previews' => 'List previews',
                 'usage' => 'Usage stats',
                 'purge' => 'Purge cache',
@@ -157,6 +163,7 @@ class BrowseCommand extends BaseCommand
             label: 'Action',
             options: [
                 'firewall' => 'Show firewall rules',
+                'insights' => 'Show insights findings',
                 'run' => 'Run a remote command',
                 'back' => '← Back',
             ],
@@ -169,6 +176,11 @@ class BrowseCommand extends BaseCommand
         if ($action === 'run') {
             $cmd = text('Command', placeholder: 'uptime', required: true);
             $this->call('servers:run', ['server' => $selected, 'command' => preg_split('/\s+/', $cmd)]);
+
+            return true;
+        }
+        if ($action === 'insights') {
+            $this->call('insights:server', ['server' => $selected]);
 
             return true;
         }
@@ -215,6 +227,27 @@ class BrowseCommand extends BaseCommand
         }
 
         $this->call("sites:{$action}", ['site' => $selected]);
+
+        return true;
+    }
+
+    private function browseOperator(): bool
+    {
+        $action = select(
+            label: 'Operator',
+            options: [
+                'summary' => 'Identity + organization summary',
+                'readme' => 'Operator readme / runbook',
+                'back' => '← Back',
+            ],
+            default: 'summary',
+        );
+
+        if ($action === 'back') {
+            return true;
+        }
+
+        $this->call("operator:{$action}");
 
         return true;
     }

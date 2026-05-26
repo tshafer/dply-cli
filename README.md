@@ -63,11 +63,14 @@ dply edge:sites                  # list Edge sites
 dply edge:show SITE              # detailed view of one site
 dply edge:deploy SITE [--branch ..] [--commit ..]
 dply edge:deployments SITE
+dply edge:deployment SITE DEPLOYMENT
 dply edge:rollback SITE DEPLOYMENT
 dply edge:env SITE [--set K=V] [--unset K] [--from-file .env]
 dply edge:logs SITE [--tail] [--since ISO]
 dply edge:lint [path]            # POST contents to /api/v1/edge/lint
 dply edge:domains SITE [--add host] [--verify host] [--remove host]
+dply edge:aliases SITE
+dply edge:access SITE [--mode none|password|dply-account|email] [--password …] [--allowed-email …]
 dply edge:previews SITE [--create branch] [--delete id] [--promote id]
 dply edge:purge SITE [paths…]
 dply edge:usage SITE
@@ -79,8 +82,16 @@ dply servers:firewall SERVER [--apply] [--template name] [--bundled key]
 dply sites:list
 dply sites:deploy SITE
 dply sites:deployments SITE
+dply sites:deployment SITE DEPLOYMENT
 
 dply insights:summary
+dply insights:server SERVER
+
+dply imports:migrations
+dply imports:migration MIGRATION
+
+dply operator:summary
+dply operator:readme [--raw]
 ```
 
 Every command takes `--host=https://your.dply.example` to target an
