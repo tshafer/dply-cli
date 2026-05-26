@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Composer dependencies (no-dev)
+        run: composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+      - name: Stamp build version
+        # The framework's `git.version` helper reads from .build/version.
+        # We populate it so the PHAR self-reports the tag instead of "unreleased".
+        run: |
+          mkdir -p .build
+          echo "${GITHUB_REF_NAME}" > .build/version
+
+      - name: Build PHAR
+        run: |
+          php dply app:build dply --build-version=${GITHUB_REF_NAME} --no-interaction
+          ls -lh builds/
+
+      - name: Rename PHAR
+        run: mv builds/dply builds/dply.phar
+
+      - name: Create / update GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            builds/dply.phar
+            install.sh

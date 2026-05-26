@@ -1,0 +1,52 @@
+{
+    "name": "tshafer/dply-cli",
+    "description": "Command-line interface for the dply platform — manage Edge sites, servers, deployments, env vars and more from your terminal.",
+    "keywords": ["dply", "cli", "laravel-zero", "edge", "deploy"],
+    "homepage": "https://github.com/tshafer/dply-cli",
+    "type": "project",
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/tshafer/dply-cli/issues",
+        "source": "https://github.com/tshafer/dply-cli"
+    },
+    "authors": [
+        {
+            "name": "Tom Shafer",
+            "email": "tom.shafer@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "laravel-zero/framework": "^12.0.2",
+        "guzzlehttp/guzzle": "^7.10",
+        "laravel/prompts": "^0.3.8",
+        "illuminate/http": "^12.40",
+        "nunomaduro/termwind": "^2.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.25.1",
+        "mockery/mockery": "^1.6.12",
+        "pestphp/pest": "^3.8.4|^4.1.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "bin": ["dply"]
+}
