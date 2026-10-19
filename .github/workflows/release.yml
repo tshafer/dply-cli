@@ -33,7 +33,7 @@ jobs:
 
       - name: Build PHAR
         run: |
-          php dply app:build dply --build-version=${GITHUB_REF_NAME} --no-interaction
+          php dply app:build dply --build-version="${GITHUB_REF_NAME}" --no-interaction
           ls -lh builds/
 
       - name: Rename PHAR
