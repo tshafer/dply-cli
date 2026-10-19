@@ -80,7 +80,7 @@ dply servers:run SERVER -- command…
 dply servers:firewall SERVER [--apply] [--template name] [--bundled key]
 
 dply sites:list
-dply sites:deploy SITE
+dply sites:deploy SITE [--wait] [--timeout=900]
 dply sites:deployments SITE
 dply sites:deployment SITE DEPLOYMENT
 
@@ -106,6 +106,43 @@ local (`https://dplyi.test`) and prod (`https://dply.app`).
 you can be logged into multiple instances simultaneously.
 
 `whoami` shows host, masked token, and cached profile.
+
+## GitHub Action
+
+Deploy a server-hosted site from CI:
+
+```yaml
+name: Deploy
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tshafer/dply-cli@v1
+        with:
+          token: ${{ secrets.DPLY_TOKEN }}
+          site: 01ksh9zqsp9pje0fx7h6h2386a
+```
+
+| Input | Default | |
+|---|---|---|
+| `token` | (required) | API token with the `sites.deploy` ability. Store it as a secret. |
+| `site` | (required) | Site ID (ULID). A slug works only if no other server has a site with the same slug. |
+| `host` | `https://dply.io` | dply instance URL. |
+| `wait` | `true` | Wait for the deployment to finish. The step fails if it fails, is skipped, or times out. |
+| `timeout` | `900` | Seconds to wait. |
+| `php-version` | `8.3` | PHP used to run the CLI (8.2+). |
+
+The action installs PHP, runs the CLI from the action's own checkout and calls
+`dply sites:deploy SITE --wait`. The site deploys its configured branch, so
+`ref`/`sha` inputs are not supported. If push-to-deploy is also enabled on the
+site, every push deploys twice, so turn one of them off.
+
+Outside the action, set `DPLY_TOKEN` (and optionally `DPLY_HOST`) to use the CLI
+without `dply login`. The env token takes precedence over the stored login.
 
 ## Local development
 

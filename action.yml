@@ -1,0 +1,56 @@
+name: 'dply deploy'
+description: 'Deploy a dply server-hosted site from CI and optionally wait for the result.'
+author: 'Tom Shafer'
+branding:
+  icon: 'upload-cloud'
+  color: 'blue'
+
+inputs:
+  token:
+    description: 'dply API token with the sites.deploy ability. Pass it from a secret.'
+    required: true
+  site:
+    description: 'Site ID (ULID) to deploy. A slug works only if it is unique across your servers.'
+    required: true
+  host:
+    description: 'dply instance URL.'
+    required: false
+    default: 'https://dply.io'
+  wait:
+    description: 'Wait for the deployment to finish and fail the step if it fails or is skipped.'
+    required: false
+    default: 'true'
+  timeout:
+    description: 'Seconds to wait before failing (with wait: true).'
+    required: false
+    default: '900'
+  php-version:
+    description: 'PHP version used to run the CLI (8.2+).'
+    required: false
+    default: '8.3'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php-version }}
+        tools: composer:v2
+        coverage: none
+
+    # Runs the CLI from the action's own checkout, so the code always
+    # matches the ref the workflow pinned (@v1, @main, @<sha>).
+    - name: Install dply CLI
+      shell: bash
+      run: composer install --no-dev --prefer-dist --no-interaction --no-progress --working-dir="$GITHUB_ACTION_PATH"
+
+    - name: Deploy
+      shell: bash
+      env:
+        DPLY_TOKEN: ${{ inputs.token }}
+        INPUT_SITE: ${{ inputs.site }}
+        INPUT_HOST: ${{ inputs.host }}
+        INPUT_WAIT: ${{ inputs.wait }}
+        INPUT_TIMEOUT: ${{ inputs.timeout }}
+      run: '"$GITHUB_ACTION_PATH/action/deploy.sh"'

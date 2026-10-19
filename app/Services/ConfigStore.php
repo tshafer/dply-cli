@@ -132,8 +132,17 @@ class ConfigStore
         return is_array($entry) ? $entry : null;
     }
 
+    /**
+     * DPLY_TOKEN, when set, wins over the stored login so CI can
+     * authenticate without `dply login` or a config file.
+     */
     public function tokenFor(string $host): ?string
     {
+        $env = getenv('DPLY_TOKEN');
+        if (is_string($env) && $env !== '') {
+            return $env;
+        }
+
         $entry = $this->hostEntry($host);
         $token = $entry['token'] ?? null;
 
